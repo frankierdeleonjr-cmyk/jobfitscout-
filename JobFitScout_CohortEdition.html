@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobFitScout — Cohort Edition</title>
+<style>
+  :root{color-scheme:dark;
+    --bg:#070d17; --card:#0e1726; --ink:#dbe7f5; --muted:#7e93ad; --line:#1d2c42;
+    --hdr:#9fd8ff; --accent:#38bdf8;
+    --green:#4ade80; --green-bg:#0b2e1a; --blue:#60a5fa; --blue-bg:#0c2344;
+    --amber:#facc15; --amber-bg:#2e2308; --red:#f87171; --red-bg:#331114;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  header{background:#0a1322;border-bottom:1px solid #16304f;padding:13px 20px}
+  header h1{font-size:18px;color:var(--hdr);letter-spacing:.05em}
+  header .sub{font-size:12px;color:var(--muted)}
+  nav{display:flex;gap:2px;background:#0a1322;border-bottom:1px solid #16304f;padding:0 10px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+  nav button{border:none;background:none;padding:11px 14px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
+  nav button.active{color:var(--hdr);border-bottom-color:var(--accent)}
+  main{max-width:1020px;margin:0 auto;padding:16px 12px 60px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+  h2{font-size:15px;margin-bottom:8px;color:var(--hdr)}
+  h3{font-size:13.5px;margin:13px 0 6px;color:var(--hdr)}
+  label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin:9px 0 3px}
+  input[type=text],input[type=number],textarea,select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;font-family:inherit;background:#0a1322;color:var(--ink)}
+  input::placeholder,textarea::placeholder{color:#46596f}
+  textarea{min-height:150px;resize:vertical}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:150px}
+  button.primary{background:#0e4e74;border:1px solid var(--accent);color:#c9ecff;padding:9px 16px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;margin-top:10px}
+  button.ghost{background:none;border:1px solid var(--line);padding:6px 11px;border-radius:7px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;vertical-align:middle}
+  .p-apply{background:var(--green-bg);color:var(--green)} .p-time{background:var(--blue-bg);color:var(--blue)}
+  .p-long{background:var(--amber-bg);color:var(--amber)} .p-skip{background:var(--red-bg);color:var(--red)}
+  .score-big{font-size:38px;font-weight:800;color:var(--hdr)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:#5d7691;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:7px;border-bottom:2px solid var(--line)}
+  td{padding:8px 7px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr.clickable{cursor:pointer} tr.clickable:hover{background:#13203a}
+  .ev-strong{color:var(--green);font-weight:700} .ev-transferable{color:var(--blue);font-weight:700}
+  .ev-weak{color:var(--amber);font-weight:700} .ev-none{color:var(--red);font-weight:700}
+  .bar-wrap{background:#14213a;border-radius:6px;height:9px;overflow:hidden;margin-top:3px}
+  .bar{height:100%;border-radius:6px;background:var(--accent)}
+  .muted{color:var(--muted);font-size:12px} .small{font-size:12px}
+  .flexsb{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+  .chip{background:#13203a;border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:11px;color:#8aa3c0}
+  details{margin-top:8px} summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--hdr)}
+  .empty{padding:26px;text-align:center;color:var(--muted)}
+  .danger{color:var(--red)}
+  .ko{border-left:3px solid var(--line);padding:5px 9px;margin:5px 0;font-size:12.5px;background:#0a1322}
+  .ko.pass{border-left-color:var(--green)} .ko.fail{border-left-color:var(--red)} .ko.verify{border-left-color:var(--amber)}
+  .skillrow{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #13203a;font-size:13px}
+  .skillrow span{flex:1}
+  .skillrow select{width:150px;padding:4px 6px;font-size:12px}
+  .setupnote{background:#0c2344;border:1px solid #1d4ed8;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:12px;color:#bcd6f5}
+</style>
+</head>
+<body>
+<header>
+  <h1>JobFitScout — Cohort Edition</h1>
+  <div class="sub">Honest job-fit scoring for transitioning service members · set up your profile once, then paste any job posting · all data stays in your browser</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+
+<script>
+/* ================= ENGINE (profile-driven) ================= */
+const SKILLS=[
+  {id:"ad",label:"Active Directory / Group Policy",rx:/active directory|ad ds\b|domain services|group policy/i},
+  {id:"entra",label:"Microsoft Entra ID / Azure AD",rx:/entra( id)?\b|azure ad\b|azure active directory/i},
+  {id:"azure",label:"Microsoft Azure (core)",rx:/\bazure\b/i},
+  {id:"azinfra",label:"Azure infrastructure (VMs/VNets/NSG)",rx:/virtual machine|\bvm\b|vnet|virtual network|network security group|\bnsg\b|load balanc/i},
+  {id:"monitor",label:"Monitoring / Log Analytics",rx:/azure monitor|log analytics|application insights|monitoring|alerting|telemetry/i},
+  {id:"iam",label:"Identity & Access Management",rx:/identity and access|\biam\b|\bicam\b|identity management|access management|access governance/i},
+  {id:"prov",label:"Account provisioning / lifecycle",rx:/provision|deprovision|account lifecycle|user lifecycle|onboard|offboard/i},
+  {id:"rbac",label:"Role-based access control",rx:/role.based access|\brbac\b|access control/i},
+  {id:"mfa",label:"MFA / Conditional Access",rx:/multi.?factor|\bmfa\b|conditional access/i},
+  {id:"sso",label:"SSO / federation",rx:/single sign|\bsso\b|saml|oidc|oauth/i},
+  {id:"pki",label:"PKI / certificates / CAC",rx:/\bpki\b|certificate|smart.?card|\bcac\b|\bpiv\b|hspd.?12|credential/i},
+  {id:"psh",label:"PowerShell",rx:/powershell/i},
+  {id:"winsrv",label:"Windows Server",rx:/windows server/i},
+  {id:"m365",label:"Microsoft 365 / Exchange",rx:/microsoft 365|office 365|\bo365\b|m365|exchange|sharepoint/i},
+  {id:"netw",label:"Networking (DNS/DHCP/TCP-IP)",rx:/\bdns\b|\bdhcp\b|tcp.?ip|subnet|\bvpn\b|firewall|switch(es|ing)?\b|router/i},
+  {id:"linux",label:"Linux",rx:/linux|red hat|rhel|ubuntu|centos/i},
+  {id:"ticket",label:"Ticketing / ITSM / service desk",rx:/ticket|itsm\b|service.?now|service desk|help.?desk|remedy|\bsla\b/i},
+  {id:"audit",label:"Audit / compliance",rx:/audit|compliance|nist|rmf\b|stig|fisma/i},
+  {id:"doc",label:"Documentation / SOPs",rx:/documentation|runbook|knowledge base|sop\b|standard operating/i},
+  {id:"cust",label:"Customer support / escalation",rx:/customer (service|support)|end.?user support|escalat|tier 1|tier 2/i},
+  {id:"incident",label:"Incident response / troubleshooting",rx:/incident (response|triage|management)|troubleshoot|root cause/i},
+  {id:"cicd",label:"CI/CD / Git / IaC",rx:/ci.?cd|github actions|\bgit\b|bicep|terraform|arm template|infrastructure as code|devops/i},
+  {id:"zerotrust",label:"Zero Trust / least privilege",rx:/zero trust|least.privilege/i},
+  {id:"vmware",label:"VMware / Hyper-V",rx:/vmware|vsphere|esxi|hyper.?v/i},
+  {id:"sql",label:"SQL / databases",rx:/\bsql\b|database admin|postgres|mysql|oracle/i},
+  {id:"container",label:"Docker / Kubernetes",rx:/docker|kubernetes|k8s|container/i},
+  {id:"python",label:"Python",rx:/python/i},
+  {id:"intune",label:"Intune / MDM / SCCM",rx:/intune|\bmdm\b|sccm|endpoint manager|jamf/i},
+  {id:"siem",label:"SIEM (Splunk/Sentinel)",rx:/splunk|\bsiem\b|sentinel|soc analyst/i},
+  {id:"aws",label:"AWS",rx:/\baws\b|amazon web services|ec2\b/i},
+  {id:"okta",label:"Okta / IGA / PAM tools",rx:/\bokta\b|sailpoint|saviynt|cyberark|beyondtrust|\bpam\b/i}
+];
+const CERTS=[
+  {id:"aplus",label:"CompTIA A+",rx:/\ba ?\+(?! rating)/i},
+  {id:"netplus",label:"CompTIA Network+",rx:/network ?\+/i},
+  {id:"secplus",label:"CompTIA Security+",rx:/security ?\+|sec ?\+|sy0.?\d{3}/i},
+  {id:"az900",label:"AZ-900 Azure Fundamentals",rx:/az.?900|azure fundamentals/i},
+  {id:"az104",label:"AZ-104 Azure Administrator",rx:/az.?104/i},
+  {id:"ccna",label:"CCNA",rx:/ccna/i},
+  {id:"itil",label:"ITIL",rx:/itil/i},
+  {id:"cysa",label:"CySA+ / advanced security",rx:/cysa|cissp|casp|oscp|cism\b/i}
+];
+const LEVELS={strong:"Strong (work / deployed project)",transferable:"Lab or direct military analog",weak:"Training only",none:"No experience"};
+const LEVEL_CREDIT={strong:1,transferable:0.8,weak:0.5,none:0};
+const EVID_CREDIT={strong:1,transferable:0.7,weak:0.5,none:0};
+const CLR_RANK={none:0,public_trust:1,secret:2,ts:3,ts_sci:4};
+
+const DEFAULT_PROFILE={
+  name:"", minSalary:60000, clearance:"secret",
+  homeState:"TX",
+  cities:"houston, san antonio, austin, dallas, fort worth, college station, killeen, el paso",
+  modesOK:{remote:true,hybrid:true,onsite:true},
+  degree:"none", // none | associate_progress | associate | bachelor_progress | bachelor
+  resumeText:"",
+  skills:Object.fromEntries(SKILLS.map(s=>[s.id,"none"])),
+  certs:Object.fromEntries(CERTS.map(c=>[c.id,"none"])) // none | progress | held
+};
+/* MSSA-grad preset: typical Server & Cloud Administration graduate */
+const MSSA_PRESET={
+  ad:"transferable",entra:"transferable",azure:"transferable",azinfra:"transferable",monitor:"transferable",
+  psh:"transferable",winsrv:"transferable",netw:"weak",linux:"weak",m365:"weak",mfa:"weak",sso:"weak",
+  iam:"weak",prov:"weak",rbac:"weak",pki:"weak",ticket:"weak",audit:"weak",doc:"transferable",cust:"transferable",
+  incident:"weak",cicd:"weak",zerotrust:"weak",
+  vmware:"none",sql:"none",container:"none",python:"none",intune:"none",siem:"none",aws:"none",okta:"none"
+};
+
+const SENIOR_RX=/\b(senior|sr\.?|lead|principal|architect|staff engineer|director)\b/i;
+const JUNIOR_RX=/\b(junior|jr\.?|associate|entry.?level|early career)\b/i;
+const FRIENDLY_TITLE_RX=/\b(administrator|admin|specialist|analyst|technician|support|operations|operator|coordinator)\b/i;
+const DEFENSE_RX=/\b(dod|department of defense|federal|government|defense contractor|disa|dhs|army|navy|air force|space force|veteran|military|cleared|gdit|leidos|peraton|saic|mantech|caci|northrop|raytheon|lockheed|maximus|usajobs)\b/i;
+const VET_RX=/\bveteran|military (experience|background|friendly)|transitioning service|skillbridge/i;
+
+function parseSalary(text){
+  const ann=[...text.matchAll(/\$\s?(\d{2,3})[,.]?(\d{3})(?!\d)/g)].map(m=>parseInt(m[1]+m[2],10)).filter(v=>v>=25000&&v<=400000);
+  const k=[...text.matchAll(/\$\s?(\d{2,3})\s?k\b/gi)].map(m=>parseInt(m[1],10)*1000);
+  const hr=[...text.matchAll(/\$\s?(\d{2}(?:\.\d{1,2})?)\s?(?:\/|per\s|an\s)h(?:ou)?r/gi)].map(m=>Math.round(parseFloat(m[1])*2080));
+  let all=ann.concat(k); if(!all.length)all=hr;
+  return all.length?{min:Math.min(...all),max:Math.max(...all)}:{min:null,max:null};
+}
+function parseYears(text){
+  const ms=[...text.matchAll(/(\d{1,2})\s*(?:\+|or more|plus)?\s*(?:to|-|–)?\s*(\d{1,2})?\s*\+?\s*years?/gi)].map(m=>parseInt(m[1],10)).filter(v=>v<=20);
+  return ms.length?Math.min(...ms):null;
+}
+function parseClearance(text){
+  const t=text.toLowerCase();let req="none",pref=false;
+  if(/ts\/?sci|top secret\/?sci/.test(t))req="ts_sci";
+  else if(/top secret/.test(t))req="ts";
+  else if(/\bsecret\b.{0,40}clearance|clearance.{0,40}\bsecret\b|active secret/.test(t))req="secret";
+  else if(/public trust|suitability/.test(t))req="public_trust";
+  else if(/security clearance|cleared\b/.test(t))req="secret";
+  if(req!=="none"&&/(clearance|cleared)[^.]{0,60}(preferred|a plus|desired|nice)/.test(t))pref=true;
+  return {req,pref};
+}
+function parseMode(text){
+  const t=text.toLowerCase();
+  if(/100% remote|fully remote|remote.?first|\bremote\b/.test(t)&&!/no remote|not remote/.test(t))return "remote";
+  if(/hybrid/.test(t))return "hybrid";
+  if(/on.?site|in.?office|in person/.test(t))return "onsite";
+  return "unknown";
+}
+function parseDegreeReq(text){
+  const t=text.toLowerCase();
+  if(!/bachelor|degree/.test(t))return "none";
+  if(/or equivalent|equivalent (relevant )?experience|degree (is )?(preferred|a plus)|in lieu of|associate'?s degree/.test(t))return "flexible";
+  if(/bachelor.{0,40}required|required.{0,40}bachelor|must (have|possess).{0,30}degree/.test(t))return "required";
+  return "preferred";
+}
+function splitPreferred(text){
+  const m=text.search(/preferred (skills|qualifications)|nice to have|bonus (points|skills)|desired (skills|qualifications)|pluses:/i);
+  return m===-1?{reqText:text,prefText:""}:{reqText:text.slice(0,m),prefText:text.slice(m)};
+}
+function inHomeArea(text,P){
+  const t=text.toLowerCase();
+  const cities=P.cities.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const st=P.homeState.trim().toLowerCase();
+  return (st&&(t.includes(" "+st.toLowerCase()+" ")||t.includes(","+st.toLowerCase())||t.includes(stateName(st))))||cities.some(c=>c&&t.includes(c));
+}
+function stateName(code){
+  const m={tx:"texas",ca:"california",fl:"florida",ga:"georgia",nc:"north carolina",va:"virginia",wa:"washington",co:"colorado",az:"arizona",md:"maryland",ny:"new york",pa:"pennsylvania",oh:"ohio",il:"illinois",tn:"tennessee",sc:"south carolina",al:"alabama",ok:"oklahoma",ks:"kansas",mo:"missouri",ky:"kentucky",la:"louisiana",hi:"hawaii",ak:"alaska"};
+  return m[code.toLowerCase()]||code.toLowerCase();
+}
+function parseJob(title,company,text,P){
+  const {reqText,prefText}=splitPreferred(text);
+  const requirements=[];
+  for(const d of SKILLS){
+    const inReq=d.rx.test(reqText),inPref=d.rx.test(prefText);
+    if(inReq||inPref)requirements.push({id:d.id,label:d.label,rx:d.rx,cert:false,required:inReq,level:P.skills[d.id]||"none"});
+  }
+  for(const c of CERTS){
+    const inReq=c.rx.test(reqText),inPref=c.rx.test(prefText);
+    if(inReq||inPref)requirements.push({id:c.id,label:c.label,rx:c.rx,cert:true,required:inReq,certState:P.certs[c.id]||"none"});
+  }
+  const sal=parseSalary(text);
+  return {title:title||"(untitled)",company:company||"",
+    salaryMin:sal.min,salaryMax:sal.max,
+    years:parseYears(text),clearance:parseClearance(text),mode:parseMode(text),
+    inArea:inHomeArea(text,P),degreeReq:parseDegreeReq(text),
+    seniorTitle:SENIOR_RX.test(title||""),
+    juniorTitle:JUNIOR_RX.test(title||"")||JUNIOR_RX.test(text.slice(0,300)),
+    friendlyTitle:FRIENDLY_TITLE_RX.test(title||""),
+    defense:DEFENSE_RX.test(text)||DEFENSE_RX.test(company||""),
+    vetFriendly:VET_RX.test(text),requirements};
+}
+
+function scoreJob(p,P){
+  const br=[];const add=(cat,pts,max,why)=>br.push({cat,pts:Math.round(pts*10)/10,max,why});
+  const skills=p.requirements.filter(r=>!r.cert);
+  let skillPts;
+  if(!skills.length){skillPts=12;add("Skill match",12,25,"No recognizable skill requirements parsed — review manually");}
+  else{let w=0,got=0;for(const s of skills){const wt=s.required?1:0.5;w+=wt;got+=wt*LEVEL_CREDIT[s.level];}
+    skillPts=25*(got/w);
+    add("Skill match",skillPts,25,`${skills.filter(s=>LEVEL_CREDIT[s.level]>=0.8).length}/${skills.length} requirements with strong or lab/transferable evidence`);}
+  let expPts,y=p.years;
+  if(y===null){expPts=11;add("Experience match",11,15,"Years not stated — neutral");}
+  else if(y<=2){expPts=15;add("Experience match",15,15,`${y} year(s) required — entry-friendly`);}
+  else if(y<=4){expPts=10;add("Experience match",10,15,`${y} years required — military experience translates, with effort`);}
+  else if(y<=7){expPts=6;add("Experience match",6,15,`${y} years required — stretch for a first civilian role`);}
+  else{expPts=3;add("Experience match",3,15,`${y}+ years — unrealistic entry point`);}
+  const c=p.clearance;const mine=CLR_RANK[P.clearance],need=CLR_RANK[c.req];
+  let clrPts;
+  if(c.req==="none"){clrPts=5;add("Clearance",5,10,"Clearance not a factor");}
+  else if(mine>=need){clrPts=10;add("Clearance",10,10,`Requires ${c.req.replace("_"," ")} — you meet or exceed it`);}
+  else if(c.pref){clrPts=6;add("Clearance",6,10,"Clearance preferred, above yours — apply anyway");}
+  else{clrPts=2;add("Clearance",2,10,`Requires ${c.req.replace("_"," ").toUpperCase()} — above your level`);}
+  const certs=p.requirements.filter(r=>r.cert);
+  let certPts,missingReqCert=false;
+  if(!certs.length){certPts=7;add("Certifications",7,10,"No specific certs demanded");}
+  else{let w=0,got=0;
+    for(const cr of certs){const wt=cr.required?1:0.5;w+=wt;
+      if(cr.certState==="held")got+=wt;
+      else if(cr.certState==="progress")got+=wt*0.5;
+      if(cr.required&&cr.certState==="none")missingReqCert=true;}
+    certPts=10*(got/w);
+    add("Certifications",certPts,10,certs.map(c0=>c0.label+" ("+(c0.certState==="held"?"held":c0.certState==="progress"?"in progress":"not held")+")").join("; "));}
+  let locPts;
+  const okRemote=P.modesOK.remote,okHybrid=P.modesOK.hybrid,okOnsite=P.modesOK.onsite;
+  if(p.mode==="remote"&&okRemote){locPts=10;add("Location",10,10,"Remote");}
+  else if(p.mode==="hybrid"&&okHybrid&&p.inArea){locPts=10;add("Location",10,10,"Hybrid in your area");}
+  else if(p.mode==="onsite"&&okOnsite&&p.inArea){locPts=10;add("Location",10,10,"On-site in your area");}
+  else if(p.mode==="unknown"){locPts=6;add("Location",6,10,"Location/arrangement unclear — verify");}
+  else if(p.inArea){locPts=7;add("Location",7,10,"In your area but arrangement may not match preferences");}
+  else{locPts=0;add("Location",0,10,"Outside your area / arrangement you ruled out");}
+  let salPts;
+  if(p.salaryMax==null){salPts=3;add("Salary",3,5,"Not posted — neutral");}
+  else if(p.salaryMax>=P.minSalary&&(p.salaryMin==null||p.salaryMin>=P.minSalary)){salPts=5;add("Salary",5,5,`Range clears your $${(+P.minSalary).toLocaleString()} floor`);}
+  else if(p.salaryMax>=P.minSalary){salPts=3;add("Salary",3,5,"Range straddles your floor — negotiate up");}
+  else{salPts=0;add("Salary",0,5,`Max $${p.salaryMax.toLocaleString()} below your floor`);}
+  let tf=4;if(p.vetFriendly)tf+=3;if(p.defense)tf+=3;if(p.juniorTitle)tf+=2;tf=Math.min(10,tf);
+  add("Transition friendliness",tf,10,[p.vetFriendly?"veteran-friendly language":null,p.defense?"defense/federal context":null,p.juniorTitle?"junior framing":null].filter(Boolean).join(", ")||"no specific signals");
+  const matched=p.requirements.filter(r=>!r.cert&&r.level!=="none");
+  let evPts;
+  if(!matched.length){evPts=4;add("Evidence strength",4,15,"Nothing matched to your claimed skills");}
+  else{const mean=matched.reduce((a,r)=>a+EVID_CREDIT[r.level],0)/matched.length;evPts=15*mean;
+    add("Evidence strength",evPts,15,`${matched.filter(r=>r.level==="strong").length} strong, ${matched.filter(r=>r.level==="transferable").length} lab/transferable, ${matched.filter(r=>r.level==="weak").length} weak`);}
+  let base=skillPts+expPts+clrPts+certPts+locPts+salPts+tf+evPts;
+  let mult=1,multWhy=[];
+  if(p.seniorTitle){mult=0.30;multWhy.push("senior/lead/architect title ×0.30");}
+  else if(p.years!=null&&p.years>=8){mult=0.35;multWhy.push("8+ years ×0.35");}
+  else if(p.years!=null&&p.years>=5){mult=0.55;multWhy.push("5–7 years ×0.55");}
+  else if(p.years!=null&&p.years>=3){mult=0.80;multWhy.push("3–4 years ×0.80");}
+  if(!p.seniorTitle){let boost=1;
+    if(p.juniorTitle){boost*=1.15;multWhy.push("junior framing ×1.15");}
+    else if(p.friendlyTitle){boost*=1.10;multWhy.push("friendly title ×1.10");}
+    mult=Math.min(1.20,mult*boost);}
+  let boostPts=0;
+  if(need>0&&mine>=need)boostPts+=8;
+  else if(c.pref)boostPts+=5;
+  if(p.defense)boostPts+=4;
+  boostPts=Math.min(12,boostPts);
+  let total=Math.max(0,Math.min(100,Math.round(base*mult+boostPts)));
+  const overrides=[];
+  if(missingReqCert&&total>59){total=59;overrides.push("Capped at Long Shot: a required certification is not held or in progress");}
+  if(need>mine&&!c.pref&&total>59){total=59;overrides.push("Capped at Long Shot: requires clearance above yours");}
+  let cls;
+  const locImpossible=(p.mode==="onsite"&&!p.inArea)||(p.mode==="remote"&&!okRemote);
+  if(locImpossible){cls="skip";overrides.push("Forced Skip: location/arrangement conflict");}
+  else cls=total>=75?"apply_now":total>=60?"apply_if_time":total>=40?"long_shot":"skip";
+  const probability={apply_now:"High",apply_if_time:"Moderate",long_shot:"Low",skip:"Minimal"}[cls];
+  const sorted=[...br].sort((a,b)=>(b.pts/b.max)-(a.pts/a.max));
+  const fitReason=sorted[0]?`${sorted[0].cat}: ${sorted[0].why}`:"";
+  const weakest=[...br].sort((a,b)=>(a.pts/a.max)-(b.pts/b.max))[0];
+  const risk=overrides[0]||(p.seniorTitle?"Senior-level title — expect screening on civilian experience":weakest?`${weakest.cat}: ${weakest.why}`:"");
+  const gaps=p.requirements.filter(r=>(r.cert&&r.certState!=="held")||(!r.cert&&(r.level==="none"||r.level==="weak"))).map(r=>({
+    label:r.label,required:r.required,
+    fix:r.cert?(r.certState==="progress"?"Finish this cert — already in progress":"Schedule this cert, or apply anyway if only preferred")
+      :r.level==="weak"?"Training-level only — build a small documented lab to strengthen this claim"
+      :"Build a documented home lab, or skip jobs that hard-require it"}));
+  return {total,cls,probability,breakdown:br,multWhy,boostPts,overrides,fitReason,risk,gaps};
+}
+function atsCheck(p,P){
+  const covered=[],reword=[],noadd=[];
+  const RT=P.resumeText||"";
+  for(const r of p.requirements){
+    if(r.cert){
+      if(r.certState==="held")covered.push({label:r.label,tip:"Held — make sure it's listed verbatim on your resume"});
+      else if(r.certState==="progress")reword.push({label:r.label,tip:"List only as 'in progress' — never as held"});
+      else noadd.push({label:r.label,tip:"Not held and not in progress — do not add"});
+      continue;
+    }
+    if(RT&&r.rx.test(RT))covered.push({label:r.label,tip:"Already on your resume — keyword searches will find it"});
+    else if(r.level==="strong"||r.level==="transferable")reword.push({label:r.label,tip:"You claim "+(r.level==="strong"?"work-level":"lab/analog")+" experience — add this exact phrase to your tailored resume with your real example"});
+    else noadd.push({label:r.label,tip:"No truthful backing — adding it would die in the first interview"});
+  }
+  return {covered,reword,noadd};
+}
+function knockouts(p,P){
+  const ko=[];const c=p.clearance;const mine=CLR_RANK[P.clearance],need=CLR_RANK[c.req];
+  if(c.req!=="none"){
+    if(mine>=need)ko.push({t:c.req.replace("_"," ")+" clearance required",s:"pass",d:"You meet or exceed it"});
+    else ko.push({t:c.req.replace("_"," ").toUpperCase()+" required",s:c.pref?"verify":"fail",d:c.pref?"Preferred only — apply with what you have":"Above your clearance — likely auto-reject unless they sponsor"});
+  }
+  if(p.years!=null){
+    if(p.years<=2)ko.push({t:`${p.years}+ years experience`,s:"pass",d:"Entry ask — your military years + training cover it"});
+    else if(p.years<=4)ko.push({t:`${p.years}+ years experience`,s:"verify",d:"Answer screeners with translated military years — arguable"});
+    else ko.push({t:`${p.years}+ years experience`,s:"fail",d:"Hard knockout — expect auto-reject"});
+  }
+  for(const r of p.requirements.filter(x=>x.cert&&x.required)){
+    if(r.certState==="held")ko.push({t:r.label+" required",s:"pass",d:"You hold it"});
+    else if(r.certState==="progress")ko.push({t:r.label+" required",s:"verify",d:"In progress — some employers accept 'scheduled', most don't"});
+    else ko.push({t:r.label+" required",s:"fail",d:"Not held — auto-reject if it's a screening question"});
+  }
+  if(p.degreeReq==="required"){
+    const hasDeg=P.degree==="bachelor";
+    ko.push({t:"Bachelor's required (no equivalency listed)",s:hasDeg?"pass":"verify",d:hasDeg?"You have it":"Apply only if you can reach a human, or skip"});
+  } else if(p.degreeReq==="flexible")ko.push({t:"Degree flexible / equivalent experience",s:"pass",d:"Experience route applies"});
+  if(p.mode==="onsite"&&!p.inArea)ko.push({t:"On-site outside your area",s:"fail",d:"Geography knockout"});
+  if(/24x7|24\/7|shift|on.?call/i.test(p.title))ko.push({t:"Shift/on-call work",s:"verify",d:"Confirm you'll accept the rotation"});
+  return ko;
+}
+const CLS_LABEL={apply_now:"Apply Immediately",apply_if_time:"Apply If Time Allows",long_shot:"Long Shot",skip:"Skip"};
+const CLS_PILL={apply_now:"p-apply",apply_if_time:"p-time",long_shot:"p-long",skip:"p-skip"};
+const STATUSES=["saved","applied","interview","rejected","offer","withdrawn"];
+</script>
+
+<script>
+/* ================= UI ================= */
+const LS_KEY="jobfitscout_v1";
+let state=load();
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(LS_KEY));
+    if(s&&s.profile&&Array.isArray(s.jobs)){
+      s.profile={...DEFAULT_PROFILE,...s.profile,
+        modesOK:{...DEFAULT_PROFILE.modesOK,...(s.profile.modesOK||{})},
+        skills:{...DEFAULT_PROFILE.skills,...(s.profile.skills||{})},
+        certs:{...DEFAULT_PROFILE.certs,...(s.profile.certs||{})}};
+      return s;}
+  }catch(e){}
+  return {profile:JSON.parse(JSON.stringify(DEFAULT_PROFILE)),jobs:[],setupDone:false};
+}
+function save(){localStorage.setItem(LS_KEY,JSON.stringify(state));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function esc(s){return (s===0?"0":(s||"")+"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+const TABS=[["setup","My Profile"],["add","Score a Job"],["dash","My Jobs"],["tracker","Tracker"],["help","Help"]];
+let activeTab=null,detailId=null;
+activeTab=state.setupDone?"add":"setup";
+
+function renderNav(){
+  document.getElementById("nav").innerHTML=TABS.map(([id,name])=>
+    `<button class="${activeTab===id?'active':''}" onclick="goTab('${id}')">${name}${id==='dash'&&state.jobs.length?` (${state.jobs.length})`:''}</button>`).join("");
+}
+function goTab(t){activeTab=t;detailId=null;render();}
+function render(){
+  renderNav();
+  const m=document.getElementById("main");
+  if(activeTab==="setup")m.innerHTML=viewSetup();
+  else if(activeTab==="add")m.innerHTML=viewAdd();
+  else if(activeTab==="tracker")m.innerHTML=viewTracker();
+  else if(activeTab==="help")m.innerHTML=viewHelp();
+  else m.innerHTML=detailId?viewDetail(detailId):viewDash();
+}
+
+/* ---------- Setup ---------- */
+function viewSetup(){
+  const P=state.profile;
+  return `<div class="setupnote"><b>One-time setup.</b> Be honest here — the whole point of this tool is scores you can trust. "Strong" means real work or a deployed project you can talk about for 5 minutes. A lab counts as a lab. Training counts as training. Lying to the scorer only wastes your own application hours.</div>
+  <div class="card"><h2>Basics</h2>
+    <div class="row">
+      <div><label>Your name (optional)</label><input type="text" id="p-name" value="${esc(P.name)}"></div>
+      <div><label>Minimum salary ($/yr)</label><input type="number" id="p-sal" value="${esc(P.minSalary)}"></div>
+      <div><label>Clearance you hold</label><select id="p-clr">
+        ${["none","public_trust","secret","ts","ts_sci"].map(c=>`<option value="${c}" ${P.clearance===c?"selected":""}>${c.replace("_"," ").toUpperCase()}</option>`).join("")}</select></div>
+      <div><label>Degree status</label><select id="p-deg">
+        <option value="none" ${P.degree==="none"?"selected":""}>No degree</option>
+        <option value="associate_progress" ${P.degree==="associate_progress"?"selected":""}>Associate in progress</option>
+        <option value="associate" ${P.degree==="associate"?"selected":""}>Associate held</option>
+        <option value="bachelor_progress" ${P.degree==="bachelor_progress"?"selected":""}>Bachelor in progress</option>
+        <option value="bachelor" ${P.degree==="bachelor"?"selected":""}>Bachelor held</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>Home state (2 letters)</label><input type="text" id="p-state" value="${esc(P.homeState)}" maxlength="2"></div>
+      <div style="flex:3"><label>Cities you'd work in (comma-separated)</label><input type="text" id="p-cities" value="${esc(P.cities)}"></div>
+    </div>
+    <label>Work arrangements you'll accept</label>
+    <div class="row">
+      <div><label><input type="checkbox" id="p-remote" ${P.modesOK.remote?"checked":""}> Remote</label></div>
+      <div><label><input type="checkbox" id="p-hybrid" ${P.modesOK.hybrid?"checked":""}> Hybrid (in my area)</label></div>
+      <div><label><input type="checkbox" id="p-onsite" ${P.modesOK.onsite?"checked":""}> On-site (in my area)</label></div>
+    </div>
+  </div>
+  <div class="card"><div class="flexsb"><h2>Your skills — honest levels only</h2>
+    <button class="ghost" onclick="applyMssaPreset()">Apply MSSA-grad preset</button></div>
+    <p class="muted">Preset = typical Server & Cloud Administration graduate (training + labs, no civilian work history). Adjust anything that's different for you.</p>
+    ${SKILLS.map(s=>`<div class="skillrow"><span>${esc(s.label)}</span>
+      <select id="sk-${s.id}">${Object.entries(LEVELS).map(([k,v])=>`<option value="${k}" ${P.skills[s.id]===k?"selected":""}>${v}</option>`).join("")}</select></div>`).join("")}
+  </div>
+  <div class="card"><h2>Certifications</h2>
+    ${CERTS.map(c=>`<div class="skillrow"><span>${esc(c.label)}</span>
+      <select id="ct-${c.id}">
+        <option value="none" ${P.certs[c.id]==="none"?"selected":""}>Not held</option>
+        <option value="progress" ${P.certs[c.id]==="progress"?"selected":""}>In progress</option>
+        <option value="held" ${P.certs[c.id]==="held"?"selected":""}>Held</option></select></div>`).join("")}
+  </div>
+  <div class="card"><h2>Your resume text (for the ATS keyword check)</h2>
+    <p class="muted">Paste your full resume as plain text. Used only to check which job keywords already appear on your resume. Stays in this browser.</p>
+    <textarea id="p-resume" placeholder="Paste your resume text here (optional but recommended)...">${esc(P.resumeText)}</textarea>
+    <button class="primary" onclick="saveProfile()">Save profile</button>
+    <span id="setup-msg" class="muted" style="margin-left:10px"></span>
+  </div>`;
+}
+function applyMssaPreset(){
+  for(const [k,v] of Object.entries(MSSA_PRESET)){
+    const el=document.getElementById("sk-"+k);if(el)el.value=v;
+  }
+  document.getElementById("setup-msg").textContent="Preset applied — now adjust for YOUR background, then Save.";
+}
+function saveProfile(){
+  const P=state.profile;
+  P.name=document.getElementById("p-name").value.trim();
+  P.minSalary=parseInt(document.getElementById("p-sal").value,10)||0;
+  P.clearance=document.getElementById("p-clr").value;
+  P.degree=document.getElementById("p-deg").value;
+  P.homeState=document.getElementById("p-state").value.trim();
+  P.cities=document.getElementById("p-cities").value;
+  P.modesOK={remote:document.getElementById("p-remote").checked,hybrid:document.getElementById("p-hybrid").checked,onsite:document.getElementById("p-onsite").checked};
+  for(const s of SKILLS)P.skills[s.id]=document.getElementById("sk-"+s.id).value;
+  for(const c of CERTS)P.certs[c.id]=document.getElementById("ct-"+c.id).value;
+  P.resumeText=document.getElementById("p-resume").value;
+  state.setupDone=true;save();
+  document.getElementById("setup-msg").textContent="Saved. Head to 'Score a Job'.";
+}
+
+/* ---------- Score a Job ---------- */
+function viewAdd(){
+  if(!state.setupDone)return `<div class="card empty"><h2>Set up your profile first</h2><p class="muted">Go to <b>My Profile</b>, set your levels honestly, and save.</p></div>`;
+  return `<div class="card">
+    <h2>Score a job posting</h2>
+    <p class="muted">Copy the entire posting from anywhere — Indeed, LinkedIn, USAJobs, ClearanceJobs, a company site — and paste it below.</p>
+    <div class="row">
+      <div><label>Job title</label><input type="text" id="f-title" placeholder="e.g. Junior Systems Administrator"></div>
+      <div><label>Company</label><input type="text" id="f-company"></div>
+    </div>
+    <label>Apply link (optional)</label><input type="text" id="f-url" placeholder="https://...">
+    <label>Full job description</label>
+    <textarea id="f-desc" placeholder="Paste everything here..."></textarea>
+    <button class="primary" onclick="addJob()">Parse &amp; Score</button>
+    <div id="add-msg"></div>
+  </div>`;
+}
+function addJob(){
+  const title=document.getElementById("f-title").value.trim();
+  const company=document.getElementById("f-company").value.trim();
+  const url=document.getElementById("f-url").value.trim();
+  const desc=document.getElementById("f-desc").value.trim();
+  if(desc.length<80){document.getElementById("add-msg").innerHTML=`<p class="danger" style="margin-top:8px">Paste the full description so scoring has something to work with.</p>`;return;}
+  const parsed=parseJob(title,company,desc,state.profile);
+  const score=scoreJob(parsed,state.profile);
+  const job={id:uid(),title:parsed.title,company,url,desc,parsed,score,status:"saved",notes:"",createdAt:new Date().toISOString().slice(0,10),appliedAt:null,followupDate:null,recruiter:""};
+  state.jobs.unshift(job);save();
+  activeTab="dash";detailId=job.id;render();window.scrollTo(0,0);
+}
+
+/* ---------- Dashboard / Detail ---------- */
+function followupAlerts(){
+  const stale=state.jobs.filter(j=>j.status==="applied"&&j.appliedAt&&!j.followupDate&&(Date.now()-new Date(j.appliedAt).getTime())/864e5>=7);
+  if(!stale.length)return "";
+  return `<div class="card" style="border-color:#5a3b10;background:#1d1606"><b style="color:var(--amber)">⚠ Follow-up needed (${stale.length})</b>
+    <div class="small" style="margin-top:5px">${stale.map(j=>`<div style="margin:3px 0"><a href="javascript:void(0)" style="color:var(--accent)" onclick="openDetail('${j.id}')">${esc(j.title)} — ${esc(j.company)}</a> · applied ${esc(j.appliedAt)}, no follow-up logged.</div>`).join("")}</div></div>`;
+}
+function viewDash(){
+  if(!state.jobs.length)return `<div class="card empty"><h2>No jobs scored yet</h2><p class="muted">Go to <b>Score a Job</b> and paste your first posting.</p></div>`;
+  const rows=[...state.jobs].sort((a,b)=>b.score.total-a.score.total).map(j=>`
+    <tr class="clickable" onclick="openDetail('${j.id}')">
+      <td><b>${esc(j.title)}</b><div class="muted">${esc(j.company)||"&nbsp;"}</div></td>
+      <td>${j.parsed.mode}</td>
+      <td>${j.parsed.salaryMax?("$"+(j.parsed.salaryMin||0).toLocaleString()+"–"+j.parsed.salaryMax.toLocaleString()):"—"}</td>
+      <td><b>${j.score.total}</b><div class="bar-wrap" style="width:56px"><div class="bar" style="width:${j.score.total}%"></div></div></td>
+      <td><span class="pill ${CLS_PILL[j.score.cls]}">${CLS_LABEL[j.score.cls]}</span></td>
+      <td>${esc(j.status)}</td></tr>`).join("");
+  return `${followupAlerts()}<div class="card"><h2>Your jobs — ranked honestly</h2>
+    <table><thead><tr><th>Job</th><th>Mode</th><th>Salary</th><th>Score</th><th>Verdict</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function openDetail(id){activeTab="dash";detailId=id;render();window.scrollTo(0,0);}
+function viewDetail(id){
+  const j=state.jobs.find(x=>x.id===id);if(!j)return viewDash();
+  const s=j.score,p=j.parsed,P=state.profile;
+  const evRows=p.requirements.map(r=>{
+    const lvl=r.cert?(r.certState==="held"?"strong":r.certState==="progress"?"weak":"none"):r.level;
+    const lc={strong:"ev-strong",transferable:"ev-transferable",weak:"ev-weak",none:"ev-none"}[lvl];
+    const lt=r.cert?(r.certState==="held"?"Held":r.certState==="progress"?"In progress":"Not held")
+      :{strong:"Strong evidence",transferable:"Lab / transferable",weak:"Training only",none:"No evidence"}[lvl];
+    return `<tr><td><b>${esc(r.label)}</b>${r.required?"":' <span class="chip">preferred</span>'}</td><td class="${lc}">${lt}</td></tr>`;}).join("");
+  const gapRows=s.gaps.length?s.gaps.map(g=>`<tr><td><b>${esc(g.label)}</b>${g.required?' <span class="chip" style="color:var(--red)">required</span>':' <span class="chip">preferred</span>'}</td><td class="small">${esc(g.fix)}</td></tr>`).join("")
+    :`<tr><td colspan="2" class="muted">No meaningful gaps detected — verify manually.</td></tr>`;
+  const brRows=s.breakdown.map(b=>`<tr><td>${b.cat}</td><td><b>${b.pts}</b> / ${b.max}<div class="bar-wrap"><div class="bar" style="width:${100*b.pts/b.max}%"></div></div></td><td class="small">${esc(b.why)}</td></tr>`).join("");
+  const ats=atsCheck(p,P),ko=knockouts(p,P);
+  const atsRow=(items,head)=>items.length?`<h3>${head} (${items.length})</h3>`+items.map(it=>`<div class="small" style="margin:3px 0 3px 8px"><b>${esc(it.label)}</b> — ${esc(it.tip)}</div>`).join(""):"";
+  return `<div class="card">
+    <button class="ghost" onclick="detailId=null;render()">&larr; Back</button>
+    <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:10px">
+      <div><div class="score-big">${s.total}</div><span class="pill ${CLS_PILL[s.cls]}">${CLS_LABEL[s.cls]}</span></div>
+      <div style="flex:1;min-width:220px">
+        <h2 style="margin:0">${esc(j.title)}</h2>
+        <div class="muted">${esc(j.company)} · Interview probability: <b>${s.probability}</b></div>
+        <div class="chips">
+          <span class="chip">${p.mode}</span>
+          ${p.years!==null?`<span class="chip">${p.years}+ yrs asked</span>`:""}
+          <span class="chip">clearance: ${p.clearance.req}</span>
+          ${p.defense?'<span class="chip">defense/federal</span>':""}
+          ${p.salaryMax?`<span class="chip">$${(p.salaryMin||0).toLocaleString()}–$${p.salaryMax.toLocaleString()}</span>`:""}
+        </div></div>
+      <div>${j.url?`<a href="${esc(j.url)}" target="_blank" rel="noopener"><button class="primary" style="margin:0">Apply ↗</button></a>`:""}</div>
+    </div>
+    <h3>Why it fits</h3><p class="small">${esc(s.fitReason)}</p>
+    <h3>Main risk</h3><p class="small ${s.overrides.length?'danger':''}">${esc(s.risk)}</p>
+    <details open><summary>Score breakdown</summary>
+      <table style="margin-top:8px"><thead><tr><th>Category</th><th>Points</th><th>Reason</th></tr></thead><tbody>${brRows}</tbody></table>
+      <p class="muted" style="margin-top:5px">Reality Filter: ${s.multWhy.length?esc(s.multWhy.join(", ")):"no adjustment"} · clearance/defense boost +${s.boostPts}</p></details>
+    <details open><summary>Evidence check — what you can truthfully claim</summary>
+      <table style="margin-top:8px"><thead><tr><th>Requirement</th><th>Your evidence</th></tr></thead><tbody>${evRows||'<tr><td colspan="2" class="muted">No recognizable requirements parsed.</td></tr>'}</tbody></table></details>
+    <details open><summary>Gap analysis</summary>
+      <table style="margin-top:8px"><thead><tr><th>Missing / weak</th><th>Fastest fix</th></tr></thead><tbody>${gapRows}</tbody></table></details>
+    <details open><summary>ATS keyword check</summary>
+      ${atsRow(ats.covered,"Already covered")}${atsRow(ats.reword,"Safe to add — truthful rewording")}${atsRow(ats.noadd,"Do not add")}
+      ${!P.resumeText?'<p class="muted">Tip: paste your resume text in My Profile to make the "already covered" check accurate.</p>':""}</details>
+    <details open><summary>Knockout questions</summary>
+      ${ko.length?ko.map(k=>`<div class="ko ${k.s}"><b>${k.s==="pass"?"✔":k.s==="fail"?"✘":"?"} ${esc(k.t)}</b> — ${esc(k.d)}</div>`).join(""):'<div class="muted small">No obvious knockouts detected.</div>'}</details>
+    <h3>Tracking</h3>
+    <div class="row">
+      <div><label>Status</label><select onchange="setStatus('${j.id}',this.value)">${STATUSES.map(st=>`<option ${j.status===st?"selected":""}>${st}</option>`).join("")}</select></div>
+      <div><label>Applied date</label><input type="text" value="${esc(j.appliedAt||"")}" placeholder="YYYY-MM-DD" onchange="setField('${j.id}','appliedAt',this.value)"></div>
+      <div><label>Follow-up date</label><input type="text" value="${esc(j.followupDate||"")}" placeholder="YYYY-MM-DD" onchange="setField('${j.id}','followupDate',this.value)"></div>
+      <div><label>Recruiter</label><input type="text" value="${esc(j.recruiter||"")}" onchange="setField('${j.id}','recruiter',this.value)"></div>
+    </div>
+    <label>Notes</label><textarea style="min-height:60px" onchange="setField('${j.id}','notes',this.value)">${esc(j.notes)}</textarea>
+    <div style="margin-top:10px"><button class="ghost danger" onclick="delJob('${j.id}')">Delete</button></div>
+  </div>`;
+}
+function setStatus(id,v){const j=state.jobs.find(x=>x.id===id);if(j){j.status=v;if(v==="applied"&&!j.appliedAt)j.appliedAt=new Date().toISOString().slice(0,10);save();render();}}
+function setField(id,f,v){const j=state.jobs.find(x=>x.id===id);if(j){j[f]=v;save();}}
+function delJob(id){if(confirm("Delete this job?")){state.jobs=state.jobs.filter(x=>x.id!==id);detailId=null;save();render();}}
+
+/* ---------- Tracker ---------- */
+function viewTracker(){
+  const all=state.jobs;
+  const counts={};all.forEach(j=>counts[j.status]=(counts[j.status]||0)+1);
+  const rows=all.map(j=>`
+    <tr class="clickable" onclick="openDetail('${j.id}')">
+      <td><b>${esc(j.title)}</b><div class="muted">${esc(j.company)}</div></td>
+      <td>${esc(j.status)}</td><td>${esc(j.appliedAt||"—")}</td><td>${esc(j.followupDate||"—")}</td>
+      <td>${esc(j.recruiter||"—")}</td><td class="small">${esc((j.notes||"").slice(0,50))}</td></tr>`).join("");
+  return `<div class="card"><div class="flexsb"><h2>Application tracker</h2>
+    <div><button class="ghost" onclick="exportData()">Export backup</button>
+      <button class="ghost" onclick="document.getElementById('imp').click()">Import</button>
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(this)"></div></div>
+    <div class="chips" style="margin-bottom:8px">${STATUSES.map(s=>counts[s]?`<span class="chip">${s}: ${counts[s]}</span>`:"").join("")}</div>
+    ${all.length?`<table><thead><tr><th>Job</th><th>Status</th><th>Applied</th><th>Follow-up</th><th>Recruiter</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`:`<div class="empty">Nothing tracked yet.</div>`}</div>`;
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="jobfitscout-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();
+}
+function importData(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const s=JSON.parse(r.result);if(s&&s.profile&&Array.isArray(s.jobs)){state=s;save();render();alert("Imported.");}else alert("Not a valid backup.");}catch(e){alert("Could not read that file.");}};
+  r.readAsText(f);
+}
+
+/* ---------- Help ---------- */
+function viewHelp(){
+  return `<div class="card"><h2>How to use JobFitScout</h2>
+    <p class="small"><b>1.</b> My Profile → set your honest skill levels (use the MSSA preset as a starting point), certs, clearance, salary floor, locations. Paste your resume text for the ATS check. Save.</p>
+    <p class="small"><b>2.</b> Find a job anywhere → copy the whole description → Score a Job → paste → Parse &amp; Score.</p>
+    <p class="small"><b>3.</b> Read the verdict: <span class="pill p-apply">Apply Immediately</span> 75–100 · <span class="pill p-time">If Time Allows</span> 60–74 · <span class="pill p-long">Long Shot</span> 40–59 · <span class="pill p-skip">Skip</span> &lt;40. The breakdown always explains the number.</p>
+    <p class="small"><b>4.</b> Track applications in Tracker. Jobs applied 7+ days ago with no follow-up get flagged.</p>
+    <h3>The rules this tool lives by</h3>
+    <p class="small">It never tells you to claim a cert you don't hold or experience you don't have. Senior/Lead/Architect titles and 5+ year requirements get their scores crushed on purpose — your application hours are worth more on jobs you can actually land. In-progress certs count half. Labs count as labs.</p>
+    <h3>Limits</h3>
+    <p class="small">Parsing is keyword-based — it can misread years, salary, or clearance, so check the chips on the verdict card and trust your own read of the posting. Scores are triage, not prophecy. Data lives only in this browser — export a backup weekly. Clearing browser data erases everything.</p>
+    <p class="muted">Built by Frankie DeLeon's job-search project · free to share with transitioning service members · v1.0</p></div>`;
+}
+render();
+</script>
+</body>
+</html>
